@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sgcarmart Refine Results
 // @namespace    sgcarmart-refine
-// @version      0.7.1
+// @version      0.7.2
 // @description  Filter sgcarmart's used-car listings and hide promotional blocks.
 // @match        https://www.sgcarmart.com/used-cars/listing*
 // @run-at       document-idle
@@ -95,6 +95,8 @@
       max-inline-size: 100%;
       min-inline-size: 0;
       margin: 0 0 16px;
+      /* The search form already leaves space above the relocated tools. */
+      padding-block: 0 16px;
       overflow-x: auto;
     }
   `);

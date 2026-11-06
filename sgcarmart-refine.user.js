@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Sgcarmart Refine Results
+// @name         sgcarmart Refine Results
 // @namespace    sgcarmart-refine
-// @version      0.7.0
-// @description  Filter Sgcarmart's used-car listings and hide promotional blocks.
+// @version      0.7.1
+// @description  Filter sgcarmart's used-car listings and hide promotional blocks.
 // @match        https://www.sgcarmart.com/used-cars/listing*
 // @run-at       document-idle
 // @inject-into  content
@@ -43,7 +43,7 @@
   const HIDE_PROMOS = 'data-sgcarmart-refine-hide-promos';
   const HANDY_ORIGINAL = 'data-sgcarmart-refine-handy-original';
   const HANDY_COPY_ID = 'sgcarmart-refine-handy-tools';
-  // Match the stable parts of Sgcarmart's CSS module names, without the build hashes.
+  // Match the stable parts of sgcarmart's CSS module names, without the build hashes.
   const CARD = '[class^="styles_listing_box__"], [class*=" styles_listing_box__"]';
   const TITLE = [
     '[class^="listing_make_model_box__"]', '[class*=" listing_make_model_box__"]',
@@ -102,24 +102,44 @@
 
   const panelStyles = new CSSStyleSheet();
   panelStyles.replaceSync(`
-    :host { display: block; margin-block: 12px; color-scheme: light dark; }
+    :host {
+      /* Match sgcarmart's light listing page, including on dark-mode desktops. */
+      --brand-red: #f0484e;
+      --action-red: #ce252e;
+      --action-hover: #af1d25;
+      --brand-tint: #fff0f1;
+      --ink: #333;
+      --muted-ink: #6c6c6c;
+      --surface: #fff;
+      --border: #ddd;
+      --control-border: #949494;
+      display: block;
+      margin-block: 12px;
+      color-scheme: light;
+    }
     section { box-sizing: border-box; font: 14px/1.4 system-ui, sans-serif;
-      color: CanvasText; background: Canvas; border: 1px solid color-mix(in srgb, CanvasText 22%, Canvas);
-      border-radius: 8px; padding: 12px 14px; }
+      color: var(--ink); background: var(--surface); border: 1px solid var(--border);
+      border-block-start: 3px solid var(--brand-red); border-radius: 8px; padding: 12px 14px; }
     header { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
     h2 { margin: 0; font-size: 15px; }
-    p { margin: 0; }
+    p { margin: 0; color: var(--muted-ink); }
     .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
       gap: 8px 12px; margin-block: 10px 8px; }
     label { display: grid; gap: 3px; font-weight: 600; }
     input, button { box-sizing: border-box; font: inherit; }
-    input[type="text"] { width: 100%; min-width: 0; padding: 6px 8px; border: 1px solid GrayText;
-      border-radius: 5px; color: FieldText; background: Field; font-weight: 400; }
+    input[type="text"] { width: 100%; min-width: 0; padding: 6px 8px; border: 1px solid var(--control-border);
+      border-radius: 5px; color: var(--ink); background: var(--surface); font-weight: 400; }
+    input[type="text"]::placeholder { color: var(--muted-ink); opacity: 1; }
     footer { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; }
     .toggle { display: inline-flex; align-items: center; gap: 6px; font-weight: 400; }
-    .toggle input { margin: 0; }
-    button { padding: 3px 9px; border: 1px solid GrayText; border-radius: 5px;
-      background: ButtonFace; color: ButtonText; cursor: pointer; }
+    .toggle input { margin: 0; accent-color: var(--action-red); }
+    button { padding: 3px 9px; border: 1px solid var(--action-red); border-radius: 5px;
+      background: var(--surface); color: var(--action-red); cursor: pointer; }
+    button:hover:enabled { background: var(--brand-tint); }
+    button[data-export] { background: var(--action-red); color: var(--surface); }
+    button[data-export]:hover:enabled { background: var(--action-hover); border-color: var(--action-hover); }
+    button:disabled { background: #f3f3f3; border-color: var(--border); color: var(--muted-ink); cursor: default; }
+    :is(input, button):focus-visible { outline: 2px solid var(--action-red); outline-offset: 2px; }
     [data-export-status]:not([hidden]) { margin-top: 8px; }
   `);
   shadow.adoptedStyleSheets = [panelStyles];
@@ -187,7 +207,7 @@
       return;
     }
 
-    // Keep the site-owned row in its original position for Sgcarmart's rerenders.
+    // Keep the site-owned row in its original position for sgcarmart's rerenders.
     if (row !== handyOriginal) {
       restoreHandyTools();
       handyCopy = row.cloneNode(true);
@@ -270,11 +290,11 @@
     const meta = resolve(data?.meta);
     if (!Array.isArray(cars) || !Number.isInteger(meta?.last_page) ||
         !Number.isInteger(meta?.current_page) || meta.last_page < 1) {
-      throw new Error('Sgcarmart did not return a readable result page.');
+      throw new Error('sgcarmart did not return a readable result page.');
     }
     const listings = cars.map(resolve);
     if (listings.some(car => !car?.id || !car.car_model || !car.link)) {
-      throw new Error('Sgcarmart returned an incomplete result page.');
+      throw new Error('sgcarmart returned an incomplete result page.');
     }
     return { listings, meta, resolve };
   }
@@ -355,7 +375,7 @@
       const response = await fetch(url, { signal: AbortSignal.timeout(20000) });
       if (!response.ok) throw new Error('Could not read result page ' + page + ' (HTTP ' + response.status + ').');
       const { listings, meta, resolve } = readSearchPage(await response.text());
-      if (meta.current_page !== page) throw new Error('Sgcarmart returned the wrong result page.');
+      if (meta.current_page !== page) throw new Error('sgcarmart returned the wrong result page.');
       if (page === 1) pages = meta.last_page;
       for (const car of listings) {
         if (!rows.has(car.id) && matches(car.car_model, include, exclude)) {
@@ -501,7 +521,7 @@
         (missing ? ' Photos unavailable: ' + missing + '.' : ''));
     } catch (error) {
       update('Export failed. ' + error.message);
-      console.warn('Sgcarmart Refine Results: export failed', error);
+      console.warn('sgcarmart Refine Results: export failed', error);
     } finally {
       delete exportButton.dataset.busy;
       scheduleRefresh();

@@ -1,7 +1,9 @@
-# Sgcarmart Refine Results
+# sgcarmart refine results
 
 A Violentmonkey userscript for the desktop used-car listing page. It filters the
-cards already loaded by Sgcarmart and keeps its native filters, sorting, and links.
+cards already loaded by sgcarmart and keeps its native filters, sorting, and links.
+
+![Refine Results on sgcarmart, with example filters and the red Export to Excel button](docs/refine-results.png)
 
 ## Install
 
@@ -10,7 +12,7 @@ cards already loaded by Sgcarmart and keeps its native filters, sorting, and lin
 2. In Helium, if Violentmonkey asks, open its extension details and enable
    **Allow User Scripts**.
 3. In each browser, open the Violentmonkey dashboard and create a new script (or
-   edit your existing **Sgcarmart Refine Results** script). Paste the entire
+   edit your existing **sgcarmart Refine Results** script). Paste the entire
    contents of `sgcarmart-refine.user.js` and save.
 4. Open or reload [your saved search](https://www.sgcarmart.com/used-cars/listing?dp2=16000&fr=2020&vts%5B%5D=13&vts%5B%5D=11&fue=Petrol&cl1=4y&page=1).
    The script switches to **100 results per page** and shows **Refine results**
@@ -40,7 +42,7 @@ cards already loaded by Sgcarmart and keeps its native filters, sorting, and lin
   including your Include and Exclude filters. The workbook has filterable
   headers, separate numeric and date fields, clickable listing links, and one
   embedded thumbnail per listing when available. If a photo cannot be downloaded,
-  its source URL is included when Sgcarmart provides one.
+  its source URL is included when sgcarmart provides one.
 
 The workbook is built in the browser with ExcelJS. The script only requests
 result pages and photos when you click **Export to Excel**. It exports data from
